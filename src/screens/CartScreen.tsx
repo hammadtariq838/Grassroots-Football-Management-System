@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Link, useNavigate } from 'react-router-dom';
 import {
   addToCart,
@@ -17,11 +18,11 @@ const CartScreen = () => {
   const cart = useAppSelector((state) => state.cart);
   const { cartItems } = cart;
 
-  const addToCartHandler = async (menu, qty) => {
+  const addToCartHandler = async (menu: any, qty: any) => {
     dispatch(addToCart({ ...menu, qty }));
   };
 
-  const removeFromCartHandler = (id) => {
+  const removeFromCartHandler = (id: any) => {
     dispatch(removeFromCart(id));
   };
   const [createOrder, { isLoading }] = usePlaceOrderMutation();
@@ -34,6 +35,7 @@ const CartScreen = () => {
       }).unwrap();
       dispatch(clearCartItems());
       navigate(`/order/${res._id}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error('Error: placing order');
       console.log('error', err);
@@ -50,7 +52,7 @@ const CartScreen = () => {
           </div>
         ) : (
           <div>
-            {cartItems.map((item) => (
+            {cartItems.map((item: any) => (
               <div key={item._id}>
                 <div className="flex items-center gap-4 border p-8">
                   <Link to={`/product/${item._id}`}>
@@ -76,13 +78,13 @@ const CartScreen = () => {
       <div>
         <div className="flex gap-4">
           <h2>
-            Subtotal ({cartItems.reduce((acc, item) => acc + item.qty, 0)})
+            Subtotal ({cartItems.reduce((acc: any, item: any) => acc + item.qty, 0)})
             items
           </h2>
           <p>
             ${' '}
             {cartItems
-              .reduce((acc, item) => acc + item.qty * item.price, 0)
+              .reduce((acc: any, item: any) => acc + item.qty * item.price, 0)
               .toFixed(2)}
           </p>
         </div>

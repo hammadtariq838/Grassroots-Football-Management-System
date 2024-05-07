@@ -35,6 +35,7 @@ const RegisterScreen = () => {
         const res = await register({ name, username, password }).unwrap();
         dispatch(setCredentials({ ...res }));
         navigate('/');
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
         toast.error(err?.data?.message || err.error);
         console.log('error', err);

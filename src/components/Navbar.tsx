@@ -21,6 +21,7 @@ const Navbar = () => {
       dispatch(logout());
       toast.error('Successfully logged out!');
       navigate('/login');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err?.data?.message || err.error);
       console.error(err);

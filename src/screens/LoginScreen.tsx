@@ -31,6 +31,7 @@ const LoginScreen = () => {
       dispatch(setCredentials({ ...res }));
       toast.success('Successfully logged in!');
       navigate('/menu');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err?.data?.message || err.error);
       console.log(err?.data?.message || err.error);
