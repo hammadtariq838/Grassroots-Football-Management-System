@@ -1,16 +1,26 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import styles from '@/css/signup.module.css';
 import { setCredentials } from '@/features/auth/authSlice';
-import { useRegisterMutation } from '@/services/usersApiSlice';
+import { useRegisterMutation } from '@/services/userApiSlice';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 const RegisterScreen = () => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -21,89 +31,83 @@ const RegisterScreen = () => {
 
   useEffect(() => {
     if (userInfo) {
-      navigate('/menu');
+      navigate('/dashboard');
     }
   }, [navigate, userInfo]);
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
-      toast.error('Passwords do not match!');
-    } else {
-      try {
-        const res = await register({ name, username, password }).unwrap();
-        dispatch(setCredentials({ ...res }));
-        navigate('/');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        toast.error(err?.data?.message || err.error);
-        console.log('error', err);
-      }
+    try {
+      const res = await register({ name, username, password }).unwrap();
+      dispatch(setCredentials({ ...res }));
+      navigate('/dashboard');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      toast.error(err?.data?.error?.message || err?.data?.message || err.error);
+      console.log(err);
     }
   };
 
   return (
-    <div className={styles.container}>
-      <form className={styles.loginform} onSubmit={submitHandler}>
-        <h2>Signup</h2>
-        <div className={styles.formgroup}>
-          <label htmlFor="fullname">Full Name</label>
-          <input
-            type="text"
-            id="fullname"
-            name="fullname"
-            placeholder="Enter your full name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div className={styles.formgroup}>
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </div>
-        <div className={styles.formgroup}>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div className={styles.formgroup}>
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            placeholder="Reenter your password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-        </div>
-        <div className={styles.formgroup}>
-          <button type="submit" disabled={isLoading}>
-            Sign Up
-          </button>
-        </div>
-        <div className={styles.formgroup}>
-          Already have an account?{' '}
-          <Link to="/login" className={styles.signuplink}>
-            Login
-          </Link>
-        </div>
-      </form>
-    </div>
+    <form className='flex items-center justify-center min-h-screen' onSubmit={submitHandler}>
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-2xl">Register</CardTitle>
+          <CardDescription>
+            Enter your username below to register your account.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              type="text"
+              placeholder="Enter your name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="username">Username</Label>
+            <Input
+              id="username"
+              type="text"
+              placeholder="Enter your username"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+        </CardContent>
+        <CardFooter className='flex-col'>
+          <Button
+            className="w-full"
+            disabled={isLoading}
+            type="submit"
+          >Sign up</Button>
+          <div className="mt-4 text-center text-sm">
+            Already have an account?{" "}
+            <Link to="/login" className="underline">
+              Login
+            </Link>
+          </div>
+        </CardFooter>
+      </Card>
+    </form>
   );
 };
 

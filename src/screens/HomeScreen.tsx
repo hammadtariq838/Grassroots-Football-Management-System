@@ -8,14 +8,11 @@ const HomeScreen = () => {
         <div className="flex flex-col">
             <div className={cn(styles.container, 'flex flex-col')}>
                 <div className={styles.header}>
-                    <h1>Welcome to our Restaurant</h1>
-                    <p>
-                        Order delicious food online or manage orders as an
-                        employee
-                    </p>
+                    <h1>Welcome!</h1>
+                    <p>grassroots football management system</p>
                 </div>
-                <Link to="/menu" className={buttonVariants()}>
-                    Go to menu
+                <Link to="/dashboard" className={buttonVariants()}>
+                    Go to dashboard
                 </Link>
             </div>
         </div>

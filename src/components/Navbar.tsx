@@ -1,11 +1,11 @@
-import styles from '@/css/navbar.module.css';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from './ui/button';
-import { ShoppingCart, Store } from 'lucide-react';
+import { Button, buttonVariants } from './ui/button';
+import { GoalIcon } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { useLogoutMutation } from '@/services/usersApiSlice';
+import { useLogoutMutation } from '@/services/userApiSlice';
 import { logout } from '@/features/auth/authSlice';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 const Navbar = () => {
   const { userInfo } = useAppSelector((state) => state.auth);
@@ -17,7 +17,7 @@ const Navbar = () => {
 
   const logoutHandler = async () => {
     try {
-      await logoutApiCall({}).unwrap();
+      await logoutApiCall().unwrap();
       dispatch(logout());
       toast.error('Successfully logged out!');
       navigate('/login');
@@ -29,47 +29,28 @@ const Navbar = () => {
   };
 
   return (
-    <div>
-      <ul className={styles.container}>
-        <span className={styles.subContainer}>
-          <Link to="/">
-            <Store className="mx-8" />
-          </Link>
-          <Link to="/">Home</Link>
-          <Link to="/menu">Menu</Link>
-          {userInfo?.isEmployee ? (
-            <Link to="/orders">Orders</Link>
-          ) : (
-            <Link to="/my-orders">My Orders</Link>
-          )}
-        </span>
-        <span className={styles.subContainer}>
-          {userInfo ? (
-            <>
-              <Link to="/profile">Profile</Link>
-              {userInfo?.isEmployee ? null : (
-                <Link to="/cart">
-                  <ShoppingCart />
-                </Link>
-              )}
-
-              <Button
-                variant="destructive"
-                className={styles.logout}
-                onClick={logoutHandler}
-              >
-                Logout
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link to="/login">Login</Link>
-              <Link to="/register">Register</Link>
-            </>
-          )}
-        </span>
-      </ul>
-    </div>
+    <header className="bg-gray-900 py-4 px-6 text-white">
+      <div className="container mx-auto flex items-center justify-between">
+        <Link to='/' className="flex items-center gap-4">
+          <GoalIcon className="h-6 w-6" />
+          <h1 className="text-2xl font-bold">Grassroots Football</h1>
+        </Link>
+        <div className="flex items-center gap-4">
+          {
+            userInfo ? (
+              <>
+                <Button variant='outline' className='text-black' onClick={logoutHandler}>Logout</Button>
+              </>
+            ) : (
+              <>
+                <Link to='/login' className={cn(buttonVariants({ variant: 'outline' }), 'text-black')}>Sign In</Link>
+                <Link to='/register' className={cn(buttonVariants({ variant: 'outline' }), 'text-black')}>Sign Up</Link>
+              </>
+            )
+          }
+        </div>
+      </div>
+    </header>
   );
 };
 

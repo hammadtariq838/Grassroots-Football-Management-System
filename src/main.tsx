@@ -9,22 +9,17 @@ import {
   Route,
   RouterProvider,
 } from 'react-router-dom';
-import HomeScreen from './screens/HomeScreen.tsx';
-import MenuScreen from './screens/MenuScreen.tsx';
-import LoginScreen from './screens/LoginScreen.tsx';
-import RegisterScreen from './screens/RegisterScreen.tsx';
-import MyOrderScreen from './screens/MyOrderScreen.tsx';
-import OrdersScreen from './screens/OrdersScreen.tsx';
-import ProfileScreen from './screens/ProfileScreen.tsx';
-
 import { store } from './app/store';
 import { Provider } from 'react-redux';
 
 import PrivateRoute from './components/PrivateRoute.tsx';
-import MenuDetailScreen from './screens/MenuDetailScreen.tsx';
-import CartScreen from './screens/CartScreen.tsx';
-import EmployeeRoute from './components/EmployeeRoute.tsx';
-import CustomerRoute from './components/CustomerRoute.tsx';
+
+import HomeScreen from './screens/HomeScreen.tsx';
+import LoginScreen from './screens/LoginScreen.tsx';
+import RegisterScreen from './screens/RegisterScreen.tsx';
+import DashboardScreen from './screens/DashboardScreen.tsx';
+import ChatScreen from './screens/ChatScreen.tsx';
+import ChatDetailScreen from './screens/ChatDetailScreen.tsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -34,16 +29,9 @@ const router = createBrowserRouter(
       <Route path="register" element={<RegisterScreen />} />
       {/* private routes */}
       <Route path="" element={<PrivateRoute />}>
-        <Route path="profile" element={<ProfileScreen />} />
-        <Route path="menu" element={<MenuScreen />} />
-      </Route>
-      <Route path="" element={<CustomerRoute />}>
-        <Route path="my-orders" element={<MyOrderScreen />} />
-        <Route path="cart" element={<CartScreen />} />
-        <Route path="menu/:id" element={<MenuDetailScreen />} />
-      </Route>
-      <Route path="" element={<EmployeeRoute />}>
-        <Route path="orders" element={<OrdersScreen />} />
+        <Route path="dashboard" element={<DashboardScreen />} />
+        <Route path="chat" element={<ChatScreen />} />
+        <Route path="chat/:id" element={<ChatDetailScreen />} />
       </Route>
     </Route>
   )
