@@ -1,20 +1,16 @@
 import { buttonVariants } from '@/components/ui/button'
-import styles from '@/css/home.module.css'
-import { cn } from '@/lib/utils'
 import { Link } from 'react-router-dom'
 
 const HomeScreen = () => {
     return (
-        <div className="flex flex-col">
-            <div className={cn(styles.container, 'flex flex-col')}>
-                <div className={styles.header}>
-                    <h1>Welcome!</h1>
-                    <p>grassroots football management system</p>
-                </div>
-                <Link to="/dashboard" className={buttonVariants()}>
-                    Go to dashboard
-                </Link>
+        <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+            <div className='grid place-items-center gap-2'>
+                <h1 className='text-2xl font-bold'>Welcome!</h1>
+                <p className='text-lg'>Grassroots Football Management System</p>
             </div>
+            <Link to="/dashboard" className={buttonVariants()}>
+                Go to dashboard
+            </Link>
         </div>
     )
 }
