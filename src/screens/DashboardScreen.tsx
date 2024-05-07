@@ -1,12 +1,77 @@
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { CardTitle, CardDescription, CardHeader, CardContent, Card } from "@/components/ui/card"
 import { AvatarFallback, Avatar } from "@/components/ui/avatar"
-import { MessageCircleIcon, MessageSquareIcon, TrashIcon, XIcon } from "lucide-react"
+import { TrashIcon } from "lucide-react"
 import Footer from "@/components/Footer"
 import Navbar from "@/components/Navbar"
-import { Link } from "react-router-dom"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useFieldArray, useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { setCredentials } from "@/features/auth/authSlice"
+import { toast } from "sonner"
+import { useSetTeamMutation } from "@/services/userApiSlice"
+import { useAppDispatch, useAppSelector } from "@/app/hooks"
+
+
+const TeamFormSchema = z.object({
+  name: z.string().min(3),
+  players: z.array(z.object({
+    name: z.string().min(3),
+  })),
+});
+
+type TeamForm = z.infer<typeof TeamFormSchema>;
 
 function DashboardScreen() {
+  const dispatch = useAppDispatch();
+  const [setTeamApi, { isLoading }] = useSetTeamMutation();
+
+  const { user } = useAppSelector((state) => state.auth);
+
+  const form = useForm<TeamForm>({
+    resolver: zodResolver(TeamFormSchema),
+    defaultValues: {
+      name: user?.user.team?.name || '',
+      players: user?.user.team?.players.map((player) => ({ name: player })) || [{ name: '' }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'players',
+  });
+
+  const onSubmit = async (data: TeamForm) => {
+    console.log(data);
+    try {
+      const res = await setTeamApi({
+        name: data.name,
+        players: data.players.map((player) => player.name),
+      }).unwrap();
+      console.log('set team', res);
+      dispatch(setCredentials({ ...res }));
+      toast.success('Successfully updated team!');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+      toast.error(err?.data?.error?.message || err?.data?.message || err.error);
+      console.log(err);
+    }
+  }
+
   return (
     <div className="flex h-screen w-full flex-col">
       <Navbar />
@@ -20,31 +85,82 @@ function DashboardScreen() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Avatar>
-                        <AvatarFallback>JD</AvatarFallback>
-                      </Avatar>
-                      <p className="text-sm font-medium leading-none">John Doe</p>
-                    </div>
-                    <Button size="icon" variant="ghost">
-                      <XIcon className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Avatar>
-                        <AvatarFallback>SM</AvatarFallback>
-                      </Avatar>
-                      <p className="text-sm font-medium leading-none">Sarah Miller</p>
-                    </div>
-                    <Button size="icon" variant="ghost">
-                      <XIcon className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <Button className="w-full" variant="outline">
-                    Add Player
-                  </Button>
+                  {
+                    user?.user.team ? (
+                      user?.user.team.players.map((player, index) => (
+                        <div key={index} className="flex items-center gap-4">
+                          <Avatar>
+                            <AvatarFallback>
+                              {player.split(' ').filter((_, i) => i < 2).map((name) => name[0].toUpperCase()).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <p className="text-sm font-medium leading-none">{player}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm font-medium leading-none">No players in your team yet.</p>
+                    )
+                  }
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="w-full" variant="outline">
+                        Manage Team
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[450]">
+                      <form onSubmit={form.handleSubmit(onSubmit)}>
+                        <DialogHeader>
+                          <DialogTitle>Manage Team</DialogTitle>
+                          <DialogDescription>
+                            Make changes to your team here. Click save when you're done.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <div className="grid  items-center gap-4">
+                            <Label htmlFor="name">
+                              Team Name
+                            </Label>
+                            <Input
+                              id="name"
+                              defaultValue="Pedro Duarte"
+                              className="col-span-3"
+                              {...form.register('name')}
+                            />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <Label>Players</Label>
+                            <Button
+                              type="button"
+                              variant='secondary'
+                              onClick={() => append({ name: '' })}
+                            >
+                              Add Player
+                            </Button>
+                          </div>
+
+                          <div className="grid gap-2">
+                            {fields.map((_, index) => (
+                              <div key={index} className="flex gap-2">
+                                <Input placeholder="Jim Hill" {...form.register(`players.${index}.name`)} />
+                                <Button size="icon" variant="destructive"
+                                  type="button" onClick={() => remove(index)}
+                                >
+                                  <TrashIcon className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <DialogFooter className="sm:justify-center">
+                          <DialogClose asChild>
+                            <Button type="submit"
+                              disabled={isLoading}
+                            >Save changes</Button>
+                          </DialogClose>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardContent>
             </Card>
@@ -79,58 +195,10 @@ function DashboardScreen() {
                 </div>
               </CardContent>
             </Card>
-            <Link to='/chat'>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Direct Messaging</CardTitle>
-                  <CardDescription>Secure communication between coaches.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <Avatar>
-                          <AvatarFallback>JB</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="text-sm font-medium leading-none">John Bauer</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">Coach</p>
-                        </div>
-                      </div>
-                      <Button size="icon" variant="ghost">
-                        <MessageCircleIcon className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <Avatar>
-                          <AvatarFallback>LM</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="text-sm font-medium leading-none">Lisa Mayer</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">Coach</p>
-                        </div>
-                      </div>
-                      <Button size="icon" variant="ghost">
-                        <MessageCircleIcon className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <Button className="w-full" variant="outline">
-                      New Message
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
           </div>
         </div>
       </main>
       <Footer />
-      <div className="fixed bottom-20 right-8">
-        <Link to='/chat' className={buttonVariants({ size: 'icon' })}>
-          <MessageSquareIcon className="h-6 w-6" />
-        </Link>
-      </div>
     </div>
   )
 }

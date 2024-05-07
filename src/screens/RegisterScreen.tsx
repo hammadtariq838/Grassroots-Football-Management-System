@@ -27,13 +27,13 @@ const RegisterScreen = () => {
 
   const [register, { isLoading }] = useRegisterMutation();
 
-  const { userInfo } = useAppSelector((state) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    if (userInfo) {
+    if (user) {
       navigate('/dashboard');
     }
-  }, [navigate, userInfo]);
+  }, [navigate, user]);
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

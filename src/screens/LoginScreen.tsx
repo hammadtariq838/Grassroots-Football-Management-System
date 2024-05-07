@@ -4,7 +4,6 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useLoginMutation } from '@/services/userApiSlice';
 import { setCredentials } from '@/features/auth/authSlice';
 import { toast } from 'sonner';
-
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -26,18 +25,19 @@ const LoginScreen = () => {
 
   const [login, { isLoading }] = useLoginMutation();
 
-  const { userInfo } = useAppSelector((state) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    if (userInfo) {
+    if (user) {
       navigate('/dashboard');
     }
-  }, [navigate, userInfo]);
+  }, [navigate, user]);
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const res = await login({ username, password }).unwrap();
+      console.log('login', res);
       dispatch(setCredentials({ ...res }));
       toast.success('Successfully logged in!');
       navigate('/dashboard');

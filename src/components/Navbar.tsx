@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 const Navbar = () => {
-  const { userInfo } = useAppSelector((state) => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ const Navbar = () => {
         </Link>
         <div className="flex items-center gap-4">
           {
-            userInfo ? (
+            user ? (
               <>
                 <Button variant='outline' className='text-black' onClick={logoutHandler}>Logout</Button>
               </>
