@@ -11,6 +11,7 @@ export const gameApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAllGames: builder.query<GetAllGamesResponse, void>({
       query: () => `${GAME_URL}/`,
+      providesTags: ['Game'],
     }),
     createGame: builder.mutation<
       CreateGameResponse,
@@ -25,8 +26,9 @@ export const gameApiSlice = apiSlice.injectEndpoints({
         method: 'POST',
         body: data,
       }),
+      invalidatesTags: ['Game'],
     }),
-    getGameById: builder.query<GetGameResponse, void>({
+    getGameById: builder.query<GetGameResponse, string>({
       query: (id) => `${GAME_URL}/${id}`,
     }),
   }),

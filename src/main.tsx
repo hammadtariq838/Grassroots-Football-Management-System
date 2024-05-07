@@ -18,8 +18,7 @@ import HomeScreen from './screens/HomeScreen.tsx';
 import LoginScreen from './screens/LoginScreen.tsx';
 import RegisterScreen from './screens/RegisterScreen.tsx';
 import DashboardScreen from './screens/DashboardScreen.tsx';
-import ChatScreen from './screens/ChatScreen.tsx';
-import ChatDetailScreen from './screens/ChatDetailScreen.tsx';
+import GameChannelScreen from './screens/GameChannelScreen.tsx';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -30,8 +29,7 @@ const router = createBrowserRouter(
       {/* private routes */}
       <Route path="" element={<PrivateRoute />}>
         <Route path="dashboard" element={<DashboardScreen />} />
-        <Route path="chat" element={<ChatScreen />} />
-        <Route path="chat/:id" element={<ChatDetailScreen />} />
+        <Route path="/:id" element={<GameChannelScreen />} />
       </Route>
     </Route>
   )
